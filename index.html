@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Image Spinner</title>
+<style>
+  body {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 100vh;
+    margin: 0;
+    font-family: sans-serif;
+    background: #f0f0f0;
+  }
+  img {
+    max-width: 80vw;
+    max-height: 80vh;
+    transform-origin: center center;
+    transition: transform 0.01s linear;
+  }
+  .controls {
+    margin-top: 20px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+</style>
+</head>
+<body>
+
+<input type="file" id="imageInput" accept="image/*">
+<div class="controls">
+  <label>Speed: <input type="number" id="speedInput" value="1" step="0.1" style="width:60px"> deg/frame</label>
+  <input type="range" id="speedSlider" min="0" max="20" value="1" step="0.1">
+  <button id="toggleButton">Run</button>
+</div>
+<img id="image" src="" alt="" style="display:none;">
+
+<script>
+  const imageInput = document.getElementById('imageInput');
+  const image = document.getElementById('image');
+  const speedSlider = document.getElementById('speedSlider');
+  const speedInput = document.getElementById('speedInput');
+  const toggleButton = document.getElementById('toggleButton');
+
+  let rotation = 0;
+  let running = false;
+  let speed = parseFloat(speedInput.value);
+  let animationFrame;
+
+  // Load selected image
+  imageInput.addEventListener('change', (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      image.src = URL.createObjectURL(file);
+      image.style.display = 'block';
+    }
+  });
+
+  // Sync slider and input
+  speedSlider.addEventListener('input', () => {
+    speed = parseFloat(speedSlider.value);
+    speedInput.value = speed;
+  });
+
+  speedInput.addEventListener('input', () => {
+    speed = parseFloat(speedInput.value);
+    speedSlider.value = speed;
+  });
+
+  // Start/stop rotation
+  toggleButton.addEventListener('click', () => {
+    running = !running;
+    toggleButton.textContent = running ? 'Stop' : 'Run';
+    if (running) animate();
+    else cancelAnimationFrame(animationFrame);
+  });
+
+  function animate() {
+    rotation = (rotation + speed) % 360;
+    image.style.transform = `rotate(${rotation}deg)`;
+    animationFrame = requestAnimationFrame(animate);
+  }
+</script>
+
+</body>
+</html>
